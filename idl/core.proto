@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+package blockchain;
+
+// PublicKey 用 bytes 来表示，存储公钥的字节流
+message PublicKey {
+  bytes key = 1;
+}
+
+// Signature 用两个字段表示，分别为 S 和 R
+message Signature {
+  bytes r = 1;  // 大整数 R 的字节表示
+  bytes s = 2;  // 大整数 S 的字节表示
+}
+
+message Transaction {
+  bytes data = 1;                  // 交易数据
+  PublicKey to = 2;                 // 接收方公钥
+  PublicKey from = 3;               // 发送方公钥
+  uint64 value = 4;                 // 交易金额
+  uint64 nonce = 5;                 // 交易序号
+  Signature signature = 6;          // 交易签名
+  
+  int64 FirstSeen = 7;
+  bytes Hash = 8;
+}
+
+message Header {
+  uint32 version = 1;
+  bytes prev_block = 2;             // 前一个区块的哈希（使用字节数组表示）
+  bytes datahash = 3;
+  int64 timestamp = 4;
+  uint32 nonce = 5;
+  uint32 height = 6;
+}
+
+message Block {
+  Header header = 1;                // 区块头
+  repeated Transaction transactions = 2; // 区块中的交易
+  PublicKey validator = 3;          // 验证者的公钥
+  Signature signature = 4;          // 区块签名
+  bytes hash = 5;                   // 区块的哈希（字节数组）
+}
