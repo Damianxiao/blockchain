@@ -9,3 +9,7 @@ func InitLog() {
 	log.SetLevel(logrus.DebugLevel)
 	LogrusObj = log
 }
+
+func Logger() *logrus.Logger {
+	return LogrusObj
+}

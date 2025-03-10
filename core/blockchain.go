@@ -9,18 +9,20 @@ import (
 )
 
 type Blockchain struct {
-	Store     Storage
-	Lock      sync.RWMutex
-	Headers   []*Header
-	Validator Validator
-	Logger    log.Logger
+	Store         Storage
+	Lock          sync.RWMutex
+	Headers       []*Header
+	Validator     Validator
+	Logger        log.Logger
+	ContractState *contractState
 }
 
 func NewBlockChain(log log.Logger, genesis *Block) *Blockchain {
 	bc := &Blockchain{
-		Headers: []*Header{},
-		Store:   NewStorage(),
-		Logger:  log,
+		Headers:       []*Header{},
+		Store:         NewStorage(),
+		Logger:        log,
+		ContractState: NewContractState(),
 	}
 	bc.Validator = NewBlockValidator(bc)
 	bc.AddBlockWithoutValidate(genesis)
@@ -34,6 +36,14 @@ func (bc *Blockchain) SetValidator(v Validator) {
 func (bc *Blockchain) AddBlock(b *Block) error {
 	if err := bc.Validator.ValidateBlock(b); err != nil {
 		return fmt.Errorf("block validation failed: %v", err)
+	}
+	// VM
+	for _, tx := range b.Transaction {
+		vm := NewVM(tx.Data, bc.ContractState)
+		if err := vm.run(); err != nil {
+			bc.Logger.Log("execute tx instructions err", err, "hash", tx.hash)
+		}
+		bc.Logger.Log("msg", "contract been exec", "data", bc.ContractState.data)
 	}
 
 	return bc.AddBlockWithoutValidate(b)

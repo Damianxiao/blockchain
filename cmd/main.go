@@ -6,8 +6,6 @@ import (
 	"blockchain/network"
 	"bytes"
 	"fmt"
-	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -61,8 +59,9 @@ func makeServer(id string, tr network.Transport, pri *crypto.PrivateKey) *networ
 
 func sendTransaction(tr network.Transport, to network.NetAddr) error {
 	pri := crypto.GenerateKeyPair()
-	d := []byte(strconv.Itoa(rand.Intn(10000000)))
-	tx := core.NewTransaction(d)
+	contract := []byte{0x01, 0x0a, 0x46, 0x0c, 0x4f, 0x0c, 0x4f, 0x0c, 0x03, 0x0a, 0x0d, 0x0f}
+
+	tx := core.NewTransaction(contract)
 	tx.Sign(&pri)
 	buf := &bytes.Buffer{}
 	// use proto

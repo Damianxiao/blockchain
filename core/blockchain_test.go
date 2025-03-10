@@ -2,14 +2,17 @@ package core
 
 import (
 	"blockchain/types"
+	"os"
 	"testing"
 
+	"github.com/go-kit/log"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBlockchain(t *testing.T) {
 	genesis, _ := RandomBlock(0)
-	bc := NewBlockChain(genesis)
+	bc := NewBlockChain(log.NewLogfmtLogger(os.Stderr), genesis)
+
 	assert.NotNil(t, bc)
 	for i := 0; i < 1000; i++ {
 		block, _ := RandomBlock(i + 1)
@@ -27,7 +30,7 @@ func TestBlockchain(t *testing.T) {
 
 func TestGetHeader(t *testing.T) {
 	genesis, _ := RandomBlock(0)
-	bc := NewBlockChain(genesis)
+	bc := NewBlockChain(log.NewLogfmtLogger(os.Stderr), genesis)
 	assert.NotNil(t, bc)
 	for i := 0; i < 1000; i++ {
 		block, _ := RandomBlock(i + 1)

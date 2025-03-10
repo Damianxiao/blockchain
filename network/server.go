@@ -76,7 +76,7 @@ free:
 			}
 			// s.Logger.Log("msg", fmt.Sprintf("tr[%s] received a msg from [%s]", s.Id, msg.From), "from", msg.From, "msg", msg)
 			if err := s.ProcessMessage(msg); err != nil {
-				s.Logger.Log("erraccur", err)
+				s.Logger.Log("an err accur:", err)
 			}
 		case <-s.QuitCh:
 			break free
