@@ -1,6 +1,8 @@
 package network
 
-type NetAddr string
+import "net"
+
+type NetAddr net.Addr
 
 type Transport interface {
 	Consume() <-chan RPC

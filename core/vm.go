@@ -129,7 +129,7 @@ func (vm *VM) parseInstr(instr byte) error {
 		case []byte:
 			res = data.([]byte)
 		}
-		fmt.Printf("key: %v , value: %v", key, res)
+		// fmt.Printf("key: %v , value: %v", key, res)
 		vm.contractstate.put(string(key), res)
 	case instrGet:
 		key := vm.stack.pop().([]byte)

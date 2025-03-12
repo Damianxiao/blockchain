@@ -100,3 +100,29 @@ func TestEncode(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, block, block2)
 }
+
+func TestEncodeBlocks(t *testing.T) {
+	bs := make([][]byte, 0)
+	blocks := make([]*Block, 0)
+	for i := 0; i < 10; i++ {
+		block, _ := RandomBlock(0)
+		buf := &bytes.Buffer{}
+		err := block.Encode(NewBlockEncoder(buf))
+		bs = append(bs, buf.Bytes())
+		assert.Nil(t, err)
+		blocks = append(blocks, block)
+	}
+	blocks2 := make([]*Block, 0)
+	buf := &bytes.Buffer{}
+
+	for _, bytes := range bs {
+		buf.Write(bytes)
+		block := &Block{
+			Header: &Header{},
+		}
+		err := block.Decode(NewBlockDecoder(buf))
+		assert.Nil(t, err)
+		blocks2 = append(blocks2, block)
+	}
+	assert.Equal(t, blocks, blocks2)
+}

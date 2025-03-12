@@ -12,6 +12,7 @@ type Blockchain struct {
 	Store         Storage
 	Lock          sync.RWMutex
 	Headers       []*Header
+	Block         []*Block
 	Validator     Validator
 	Logger        log.Logger
 	ContractState *contractState
@@ -43,7 +44,7 @@ func (bc *Blockchain) AddBlock(b *Block) error {
 		if err := vm.run(); err != nil {
 			bc.Logger.Log("execute tx instructions err", err, "hash", tx.hash)
 		}
-		bc.Logger.Log("msg", "contract been exec", "data", bc.ContractState.data)
+		bc.Logger.Log("msg", "contract been exec", "data", fmt.Sprintf("%v", bc.ContractState.data))
 	}
 
 	return bc.AddBlockWithoutValidate(b)
@@ -56,6 +57,7 @@ func (bc *Blockchain) Height() uint32 {
 
 func (bc *Blockchain) AddBlockWithoutValidate(b *Block) error {
 	bc.Headers = append(bc.Headers, b.Header)
+	bc.Block = append(bc.Block, b)
 	// logger should here
 	bc.Logger.Log("msg", "new block created", "hash", NewBlockHasher().Hash(b.Header), "height", b.Height, "blockchain height", bc.Height())
 
@@ -73,4 +75,11 @@ func (bc *Blockchain) GetHeader(height uint32) (*Header, error) {
 		return nil, e.ErrBlockUnKnown
 	}
 	return bc.Headers[height], nil
+}
+
+func (bc *Blockchain) GetBlock(height uint32) (*Block, error) {
+	if height > bc.Height() {
+		return nil, e.ErrBlockUnKnown
+	}
+	return bc.Block[height], nil
 }
